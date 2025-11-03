@@ -5,3 +5,4 @@ pydantic-settings
 sseclient-py
 python-dotenv
 requests
+gunicorn
