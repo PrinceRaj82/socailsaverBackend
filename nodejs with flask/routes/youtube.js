@@ -38,6 +38,37 @@ router.get('/video', async (req, res) => {
   res.json({ videoId, transcript });
 });
 
+
+router.get('/getapikey', async (req, res) => {
+  console.log('hello')
+   async function getYoutubeKey() {
+    const res = await axios.get("https://www.youtube.com/watch?v=mwYsapR6cYk");
+    const html = res.data;
+    const versionMatch = html.match(
+      /"INNERTUBE_CONTEXT_CLIENT_VERSION":"([0-9\.]+)"/
+    );
+    const clientVersion = versionMatch ? versionMatch[1] : "2.20240214.01.00";
+
+    // Regex to extract key
+    const match = html.match(/"INNERTUBE_API_KEY":"([A-Za-z0-9_\-]+)"/);
+    if (match) return [match[1], versionMatch, clientVersion];
+    return null;
+  }
+  
+  try {
+    const key = await getYoutubeKey(); // ✅ wait for async result
+    res.json({ success: true, key }); // ✅ send response properly
+  } 
+  catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch key", 
+      error: err.message 
+    });
+  }
+  
+});
+
 router.get("/transcript", async (req, res) => {
   try {
     const { url, lang } = req.query;
